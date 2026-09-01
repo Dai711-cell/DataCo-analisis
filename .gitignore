@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Local environments
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# R / rendered artifacts
+.Rhistory
+.RData
+.Rproj.user/
+*.html
+
+# Raw datasets - keep local, do not commit
+DataCoSupplyChainDataset.csv
+DescriptionDataCoSupplyChain.csv
+tokenized_access_logs.csv
+
+# Derived data - regenerable and often large
+data/processed/*.csv
+data/processed/*.parquet
+data/processed/*.pkl
+
+# Optional local exports
+outputs/
+exports/
+

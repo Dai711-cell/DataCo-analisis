@@ -1,0 +1,272 @@
+﻿---
+title: "EDA de Variables para Modelo de Ventas"
+subtitle: "DataCo Supply Chain"
+author: "Proyecto DataCo"
+date: "2026-07-05"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    theme: readable
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+<div align="center">
+
+# EDA de Variables para Modelo de Ventas
+
+## DataCo Supply Chain
+
+**Objetivo:** revisar variables candidatas antes de modelar ventas y visualizar su distribucion con graficos de barras.
+
+</div>
+
+---
+
+# 1. Resumen
+
+Este informe revisa variables disponibles para un futuro modelo de ventas. No se modificaron los CSV raw; las variables nuevas se guardaron como salidas derivadas en `data/processed/`.
+
+Variable objetivo propuesta: `Sales`.
+
+| metrica | valor |
+| --- | --- |
+| Filas analizadas | 180.519 |
+| Ventas totales | 36.784.735,01 |
+| Pedidos unicos | 65.752 |
+| Compradores unicos | 20.652 |
+| Productos unicos | 118 |
+| Paises de pedido | 164 |
+| Ciudades de pedido | 3.597 |
+
+---
+
+# 2. Variables Revisadas
+
+Se revisaron las variables solicitadas y solo se usaron las que existen o se pueden derivar de columnas reales.
+
+| variable_solicitada | estado | columnas_usadas |
+| --- | --- | --- |
+| ventas_por_comprador | Disponible | Customer Id, Order Customer Id, Customer Segment |
+| pais_ciudad_pedido | Disponible | Order Country, Order City, Order Region, Market |
+| pais_ciudad_cliente | Disponible | Customer Country, Customer City |
+| fecha_pedido | Disponible | order_datetime, order date (DateOrders) |
+| dia_semana | Derivada | order_datetime |
+| festivos | Derivada aproximada | order_datetime |
+| ofertas_descuentos | Disponible | Order Item Discount, Order Item Discount Rate |
+| campanas_marketing | No disponible en los datasets revisados | - |
+| producto_categoria | Disponible | Product Name, Category Name, Department Name |
+| precio_cantidad | Disponible | Order Item Product Price, Order Item Quantity |
+| metodo_pago | Disponible | payment_type_cash, payment_type_debit, payment_type_payment, payment_type_transfer |
+| visitas_web_producto | Disponible como tabla agregada | product_sales_vs_web_views.csv |
+
+Notas importantes:
+
+- No hay columna explicita de campana de marketing. Por tanto no se usa `campana` como variable del modelo.
+- Los descuentos si existen y se usan como proxy de ofertas: `Order Item Discount` y `Order Item Discount Rate`.
+- Los festivos se derivan de la fecha de pedido con una marca simple de festivos genericos. No sustituyen un calendario oficial por pais.
+- Los periodos tipo Black Friday o Navidad son periodos de calendario derivados, no campanas reales.
+
+---
+
+# 3. Graficos de Variables Candidatas
+
+
+## Ventas por pais de pedido
+
+<img src="figures/sales_feature_eda/01_ventas_por_pais_de_pedido.png" alt="Ventas por pais de pedido" width="920">
+
+**Lectura:** Donde se concentra la facturacion por mercado geografico de destino.
+
+## Ventas por ciudad de pedido
+
+<img src="figures/sales_feature_eda/02_ventas_por_ciudad_de_pedido.png" alt="Ventas por ciudad de pedido" width="920">
+
+**Lectura:** Ciudades con mayor peso comercial; candidatas para variables geograficas del modelo.
+
+## Ventas por region de pedido
+
+<img src="figures/sales_feature_eda/03_ventas_por_region_de_pedido.png" alt="Ventas por region de pedido" width="920">
+
+**Lectura:** Agrupa paises/ciudades en regiones con diferencias claras de volumen.
+
+## Ventas por mercado
+
+<img src="figures/sales_feature_eda/04_ventas_por_mercado.png" alt="Ventas por mercado" width="920">
+
+**Lectura:** Mercado es una variable compacta y util para capturar diferencias regionales.
+
+## Ventas por segmento de comprador
+
+<img src="figures/sales_feature_eda/05_ventas_por_segmento_de_comprador.png" alt="Ventas por segmento de comprador" width="920">
+
+**Lectura:** Permite ver si Consumer, Corporate o Home Office tienen patrones distintos de ventas.
+
+## Ventas por pais del comprador
+
+<img src="figures/sales_feature_eda/06_ventas_por_pais_del_comprador.png" alt="Ventas por pais del comprador" width="920">
+
+**Lectura:** Pais del cliente puede aportar senal distinta al pais de entrega.
+
+## Ventas por ciudad del comprador
+
+<img src="figures/sales_feature_eda/07_ventas_por_ciudad_del_comprador.png" alt="Ventas por ciudad del comprador" width="920">
+
+**Lectura:** Ciudades de cliente con mas volumen de compra.
+
+## Ventas por comprador
+
+<img src="figures/sales_feature_eda/08_ventas_por_comprador.png" alt="Ventas por comprador" width="920">
+
+**Lectura:** Compradores de mayor valor historico; util para variables agregadas por cliente.
+
+## Ventas por banda de valor del comprador
+
+<img src="figures/sales_feature_eda/09_ventas_por_banda_de_valor_del_comprador.png" alt="Ventas por banda de valor del comprador" width="920">
+
+**Lectura:** Resume clientes segun su valor historico total sin usar miles de IDs directamente.
+
+## Ventas por departamento
+
+<img src="figures/sales_feature_eda/10_ventas_por_departamento.png" alt="Ventas por departamento" width="920">
+
+**Lectura:** Departamento de producto como senal comercial de alto nivel.
+
+## Ventas por categoria
+
+<img src="figures/sales_feature_eda/11_ventas_por_categoria.png" alt="Ventas por categoria" width="920">
+
+**Lectura:** Categorias con mas peso en ventas.
+
+## Ventas por producto
+
+<img src="figures/sales_feature_eda/12_ventas_por_producto.png" alt="Ventas por producto" width="920">
+
+**Lectura:** Productos top; si hay pocos productos dominantes, el modelo debe capturarlo.
+
+## Ventas por mes cronologico
+
+<img src="figures/sales_feature_eda/13_ventas_por_mes_cronologico.png" alt="Ventas por mes cronologico" width="920">
+
+**Lectura:** Evolucion mensual en orden temporal, util para tendencia y estacionalidad.
+
+## Ventas por mes del anio
+
+<img src="figures/sales_feature_eda/14_ventas_por_mes_del_anio.png" alt="Ventas por mes del anio" width="920">
+
+**Lectura:** Estacionalidad por mes sin depender del anio concreto.
+
+## Ventas por dia de la semana
+
+<img src="figures/sales_feature_eda/15_ventas_por_dia_de_la_semana.png" alt="Ventas por dia de la semana" width="920">
+
+**Lectura:** Patron semanal de compra en orden natural de lunes a domingo.
+
+## Ventas en fin de semana vs laborable
+
+<img src="figures/sales_feature_eda/16_ventas_en_fin_de_semana_vs_laborable.png" alt="Ventas en fin de semana vs laborable" width="920">
+
+**Lectura:** Diferencia entre compras de fin de semana y dias laborables.
+
+## Ventas en festivos genericos
+
+<img src="figures/sales_feature_eda/17_ventas_en_festivos_genericos.png" alt="Ventas en festivos genericos" width="920">
+
+**Lectura:** Festivos derivados del calendario; no son una columna original del dataset.
+
+## Ventas por periodo comercial de calendario
+
+<img src="figures/sales_feature_eda/18_ventas_por_periodo_comercial_de_calendario.png" alt="Ventas por periodo comercial de calendario" width="920">
+
+**Lectura:** Periodos derivados de fecha como Navidad o Black Friday; no equivalen a campanas reales.
+
+## Ventas con descuento vs sin descuento
+
+<img src="figures/sales_feature_eda/19_ventas_con_descuento_vs_sin_descuento.png" alt="Ventas con descuento vs sin descuento" width="920">
+
+**Lectura:** Evalua si las ofertas/descuentos concentran ventas.
+
+## Ventas por rango de descuento
+
+<img src="figures/sales_feature_eda/20_ventas_por_rango_de_descuento.png" alt="Ventas por rango de descuento" width="920">
+
+**Lectura:** Rangos de descuento como proxy de ofertas.
+
+## Ventas por descuento absoluto
+
+<img src="figures/sales_feature_eda/21_ventas_por_descuento_absoluto.png" alt="Ventas por descuento absoluto" width="920">
+
+**Lectura:** Importe descontado por linea de pedido.
+
+## Ventas por cantidad de producto
+
+<img src="figures/sales_feature_eda/22_ventas_por_cantidad_de_producto.png" alt="Ventas por cantidad de producto" width="920">
+
+**Lectura:** Cantidad comprada por linea, clave para ventas.
+
+## Ventas por banda de precio
+
+<img src="figures/sales_feature_eda/23_ventas_por_banda_de_precio.png" alt="Ventas por banda de precio" width="920">
+
+**Lectura:** Banda de precio del producto.
+
+## Ventas por banda de margen
+
+<img src="figures/sales_feature_eda/24_ventas_por_banda_de_margen.png" alt="Ventas por banda de margen" width="920">
+
+**Lectura:** Relacion entre ventas y rentabilidad.
+
+## Ventas por metodo de pago
+
+<img src="figures/sales_feature_eda/25_ventas_por_metodo_de_pago.png" alt="Ventas por metodo de pago" width="920">
+
+**Lectura:** Metodo de pago ya codificado sin sesgo ordinal.
+
+## Ventas por tipo de envio
+
+<img src="figures/sales_feature_eda/26_ventas_por_tipo_de_envio.png" alt="Ventas por tipo de envio" width="920">
+
+**Lectura:** El tipo de envio puede estar asociado al valor del pedido.
+
+## Ventas por estado del pedido
+
+<img src="figures/sales_feature_eda/27_ventas_por_estado_del_pedido.png" alt="Ventas por estado del pedido" width="920">
+
+**Lectura:** Estados de pedido y posibles cancelaciones/fraude pueden afectar ventas netas.
+
+## Ventas vs visitas web por producto
+
+<img src="figures/sales_feature_eda/28_ventas_vs_visitas_web_por_producto.png" alt="Ventas vs visitas web por producto" width="920">
+
+**Lectura:** Las visitas web pueden aportar una senal de demanda, aunque no sustituyen las ventas reales.
+
+
+---
+
+# 4. Lectura para el Modelo
+
+Variables con pinta de aportar senal:
+
+- geografia: `Order Country`, `Order City`, `Order Region`, `Market`;
+- comprador: `Customer Id`, `Customer Segment`, banda de valor historico del comprador;
+- producto: `Product Name`, `Category Name`, `Department Name`;
+- precio y cantidad: `Order Item Product Price`, `Order Item Quantity`;
+- descuentos/ofertas: `Order Item Discount`, `Order Item Discount Rate`, `has_discount`;
+- calendario: mes, dia de semana, fin de semana, periodos comerciales derivados;
+- metodo de pago y tipo de envio como variables auxiliares.
+
+Variables no disponibles para usar directamente:
+
+- campanas de marketing;
+- festivos oficiales por pais;
+- stock, inventario o disponibilidad;
+- costes publicitarios;
+- distancia de envio;
+- canal real de adquisicion del cliente.
+
+Siguiente paso recomendado: construir un primer baseline de ventas con variables disponibles y comparar si las agregaciones por cliente, producto, geografia y calendario mejoran frente a una media historica simple.
