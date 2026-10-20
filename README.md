@@ -1,6 +1,6 @@
 # DataCo Supply Chain Analytics
 
-Proyecto de analisis y modelado sobre el dataset DataCo Supply Chain. El trabajo se centra en dos decisiones de negocio:
+Proyecto personal de análisis y modelado sobre el dataset público DataCo Supply Chain. No es un encargo realizado para la empresa. El trabajo se centra en dos decisiones de negocio:
 
 - mejorar la promesa de entrega al cliente;
 - estimar la demanda diaria por producto para apoyar la planificacion.
