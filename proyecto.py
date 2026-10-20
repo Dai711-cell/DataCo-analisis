@@ -12,6 +12,7 @@ PROJECT_DIR = Path(__file__).resolve().parent
 REPORTS_DIR = PROJECT_DIR / "reports"
 OUTPUT_REPORT = REPORTS_DIR / "data_overview_report.md"
 DATE_FORMAT = "%m/%d/%Y %H:%M"
+PRIVATE_COLUMNS = {"Customer Email", "Customer Fname", "Customer Lname", "Customer Password", "Customer Street", "ip"}
 
 DATASETS = {
     "DataCoSupplyChainDataset": PROJECT_DIR / "DataCoSupplyChainDataset.csv",
@@ -214,6 +215,7 @@ def compact_head(df: pd.DataFrame, dataset_name: str, rows: int = 8) -> str:
     selected_columns = [column for column in configured if column in df.columns]
     if not selected_columns:
         selected_columns = list(df.columns[: min(10, len(df.columns))])
+    selected_columns = [c for c in selected_columns if c not in PRIVATE_COLUMNS]
     return code_block(df[selected_columns].head(rows).to_string(index=False))
 
 
@@ -227,7 +229,7 @@ def vertical_head(df: pd.DataFrame, rows: int = 3) -> str:
         for group_name, columns in grouped_columns.items():
             table_rows = []
             for column in columns:
-                value = row[column]
+                value = "[omitido en informe público]" if column in PRIVATE_COLUMNS else row[column]
                 meaning = COLUMN_HINTS.get(column, "Pendiente de interpretar; revisar con el diccionario o con analisis posterior.")
                 table_rows.append([column, value, meaning])
             sections.append(f"#### {group_name}")
@@ -277,7 +279,7 @@ def summarize_dataset(name: str, path: Path) -> str:
     sections.append(dataframe_preview(numeric_describe, max_rows=80))
 
     sections.append("## Describe categorico y general")
-    general_describe = df.describe(include="all").transpose()
+    general_describe = df.drop(columns=list(PRIVATE_COLUMNS), errors="ignore").describe(include="all").transpose()
     sections.append(dataframe_preview(general_describe, max_rows=80))
 
     sections.append("## Tipos de datos")
@@ -318,7 +320,7 @@ def summarize_dataset(name: str, path: Path) -> str:
     sections.append(dataframe_preview(date_like, max_rows=40))
 
     sections.append("## Valores frecuentes en columnas categoricas")
-    cat_columns = categorical_columns(df)
+    cat_columns = [c for c in categorical_columns(df) if c not in PRIVATE_COLUMNS]
     if not cat_columns:
         sections.append("No se detectaron columnas categoricas.")
     else:
